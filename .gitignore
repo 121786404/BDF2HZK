@@ -4,10 +4,17 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 *.bmp
+*.bin
+*.mz
+*.spec
+*.bmp
+*.pyc
+DSET.ini
+
 
 # User-specific files
 
-*.user
+
 *.userosscache
 *.sln.docstates
 
