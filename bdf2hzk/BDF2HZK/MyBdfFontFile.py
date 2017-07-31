@@ -99,7 +99,10 @@ class MyBdfFontFile(object):
             if not s or s[:13] == b"ENDPROPERTIES":
                 break
             i = s.find(b" ")
-            props[s[:i].decode('ascii')] = s[i+1:-1].decode('ascii')
+            try:
+                props[s[:i].decode('ascii')] = s[i+1:-1].decode('ascii')
+            except:
+                pass
   
         if "DWIDTH" in props:
             [dwx0, dwy0] = [int(p) for p in props["DWIDTH"].split()]

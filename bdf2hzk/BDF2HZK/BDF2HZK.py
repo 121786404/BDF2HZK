@@ -74,20 +74,23 @@ example:
     hz_height = font_height
 
     with open(outfilename, 'wb') as outfile:
-        for qu in range(1, 95):
+        for qu in range(1, 88):
             for wei in range(1, 95):
-
+                #qu = 1
+                #wei = 2
                 gb2312_code = chr(qu + 160 ) + chr(wei + 160 )
                 try:
                     unicode_code = gb2312_code.decode('gb2312')
                 except: 
                     hz_image = Image.new("1", (hz_width, hz_height), 0)
                     get_pix(hz_image).tofile(outfile)
+                    continue
  
                 bfd_glyph = bdf_font[ord(unicode_code)]
                 if bfd_glyph is None:
                     hz_image = Image.new("1", (hz_width, hz_height), 0)
                     get_pix(hz_image).tofile(outfile)
+                    continue
                 else:
                     bbx = bfd_glyph['bbx']
                     im  = bfd_glyph['im']
