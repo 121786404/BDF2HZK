@@ -1,0 +1,4 @@
+*.bin
+*.mz
+/build
+*.spec
