@@ -1,1 +1,0 @@
-..\..\bdf2bmp\Debug\bdf2bmp.exe SimSun-16.bdf -c 16 SimSun-16.bmp

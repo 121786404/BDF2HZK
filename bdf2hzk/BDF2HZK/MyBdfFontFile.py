@@ -20,12 +20,13 @@ bdf_spacing = {
     "C": "Cell"
 }
 
-dx = 0
-dy = 0
+dwx0 = 0
+dwy0 = 0
 
 def my_bdf_char(f):
-    global dx
-    global dy
+    
+    global dwx0
+    global dwy0
 
     # skip to STARTCHAR
     while True:
@@ -55,21 +56,22 @@ def my_bdf_char(f):
     bitmap = b"".join(bitmap)
     
     if "BBX" in props:
-        [x, y, l, d] = [int(p) for p in props["BBX"].split()]
+        [BBw, BBh, BBxoff0x, BByoff0y] = [int(p) for p in props["BBX"].split()]
 
     if "DWIDTH" in props:
-        [dx, dy] = [int(p) for p in props["DWIDTH"].split()]
-    
-    bbox = (dx, dy), (l, -d-y, x+l, -d), (0, 0, x, y)
+        [dwx0, dwy0] = [int(p) for p in props["DWIDTH"].split()]
+     
+    bbx = (BBw, BBh, BBxoff0x, BByoff0y)
+    dwidth = (dwx0, dwy0)
 
     try:
-        im = Image.frombytes("1", (x, y), bitmap, "hex", "1")
+        im = Image.frombytes("1", (BBw, BBh), bitmap, "hex", "1")
         #im = Image.frombytes("1", (x, y), bitmap)
     except ValueError:
         # deal with zero-width characters
-        im = Image.new("1", (x, y))
+        im = Image.new("1", (BBw, BBh))
 
-    return id, int(props["ENCODING"]), bbox, im
+    return id, int(props["ENCODING"]), bbx, dwidth, im
 
 
 ##
@@ -81,6 +83,8 @@ class MyBdfFontFile(object):
 
 
         self.glyph = [None] * 65536
+        #self.dwidth
+        #self.fbbx
 
         s = fp.readline()
         if s[:9] != b"STARTFONT":
@@ -88,8 +92,8 @@ class MyBdfFontFile(object):
 
         props = {}
         comments = []
-        global dx
-        global dy
+        global dwx0
+        global dwy0
         while True:
             s = fp.readline()
             if not s or s[:13] == b"ENDPROPERTIES":
@@ -98,7 +102,20 @@ class MyBdfFontFile(object):
             props[s[:i].decode('ascii')] = s[i+1:-1].decode('ascii')
   
         if "DWIDTH" in props:
-            [dx, dy] = [int(p) for p in props["DWIDTH"].split()]
+            [dwx0, dwy0] = [int(p) for p in props["DWIDTH"].split()]
+            #self.dwidth =  [dwx0, dwy0]
+
+        if "FONTBOUNDINGBOX" in props:
+            [FBBx, FBBy , Xoff, Yoff] = [int(p) for p in props["FONTBOUNDINGBOX"].split()]
+            self.fbbx = {}
+            self.fbbx['FBBx'] = FBBx
+            self.fbbx['FBBy'] = FBBy
+            self.fbbx['Xoff'] = Xoff
+            self.fbbx['Yoff'] = Yoff
+
+
+        #if "CHARS" in props:
+        #    chars = [int(p) for p in props["CHARS"].split()]   
 
         # font = props["FONT"].split("-")
 
@@ -119,9 +136,19 @@ class MyBdfFontFile(object):
             if not c:
                 break
 
-            id, ch, (xy, dst, src), im = c
+            id, ch, bbx, dwidth,im = c
             if 0 <= ch < len(self.glyph):
-                self.glyph[ch] = num, xy, dst, src, im
+                self.glyph[ch] = {}
+                self.glyph[ch]['id'] = id
+                self.glyph[ch]['bbx'] = {}
+                self.glyph[ch]['bbx']['BBw'] = bbx[0]
+                self.glyph[ch]['bbx']['BBh'] = bbx[1]
+                self.glyph[ch]['bbx']['BBxoff0x'] = bbx[2]
+                self.glyph[ch]['bbx']['BByoff0y'] = bbx[3]
+                self.glyph[ch]['dwidth'] = {}
+                self.glyph[ch]['dwidth']['dwx0'] = dwidth[0]
+                self.glyph[ch]['dwidth']['dwy0'] = dwidth[1]
+                self.glyph[ch]['im'] = im
                 num = num +1
     
     def __getitem__(self, ix):

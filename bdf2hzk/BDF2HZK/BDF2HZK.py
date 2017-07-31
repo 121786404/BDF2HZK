@@ -17,13 +17,14 @@ def get_pix(image):
     for h in range(height):
         for w in range(width):
             if pixel[w, h] > 0:
-                bitmap.append(False)
-            else:
                 bitmap.append(True)
+            else:
+                bitmap.append(False)
     return bitmap
 
 
 def main():
+
     help = 'Usage: %s [option] <truetype-file>' % sys.argv[0]
     help += '''\noption:
     -h | --help                                 display this information
@@ -68,35 +69,53 @@ example:
 
     bdf_file = open(bdfilename, "rb")
     bdf_font = MyBdfFontFile.MyBdfFontFile(bdf_file)
-    bmp_file_mame = os.path.splitext(bdfilename)[0] + ".bmp";
-    bmp_image = Image.open(bmp_file_mame)
+    fbbx = bdf_font.fbbx
+    hz_width  = (font_width + 7)/8*8;
+    hz_height = font_height
 
     with open(outfilename, 'wb') as outfile:
-        for i in range(0xA1, 0xF8):
-            for j in range(0xA1, 0xFF):
-                i = 0xA5
-                j - 0xA2
-                gb2312_code = chr(i) + chr(j)
+        for qu in range(1, 95):
+            for wei in range(1, 95):
+
+                gb2312_code = chr(qu + 160 ) + chr(wei + 160 )
                 try:
                     unicode_code = gb2312_code.decode('gb2312')
                 except: 
-                    pass
+                    hz_image = Image.new("1", (hz_width, hz_height), 0)
+                    get_pix(hz_image).tofile(outfile)
  
                 bfd_glyph = bdf_font[ord(unicode_code)]
                 if bfd_glyph is None:
-                    pass
+                    hz_image = Image.new("1", (hz_width, hz_height), 0)
+                    get_pix(hz_image).tofile(outfile)
                 else:
-                    bmp_pos = bfd_glyph[0];
-                    # 为什么bmp里面的字宽度是17？
-                    left  = (bmp_pos%(bmp_image.width/font_width))*(font_width + 1) + 2
-                    upper = (bmp_pos/(bmp_image.width/font_width))*(font_height + 2) + 2
-                    right = left + font_width - 1
-                    lower = upper + font_height
-                    box = (left,upper,right,lower)
-                    region = bmp_image.crop(box)
-                    #region.show()
-                    get_pix(region).tofile(outfile)
+                    bbx = bfd_glyph['bbx']
+                    im  = bfd_glyph['im']
+                    #im.show()
+                    
+                    #       fbbx  bbx
+                    # w     FBBx  BBw
+                    # h     FBBy  BBh
+                    # offx  Xoff  BBxoff0x
+                    # offy  Yoff  BByoff0y
+            
+                    # offleft = (-1)*font.offx + glyph.offx;
+                    # offbottom = (-1)*font.offy + glyph.offy;
+                    # offtop = font.h - glyph.h - offbottom;
 
+                    offleft   = bbx['BBxoff0x'] - fbbx['Xoff'];
+                    offbottom = bbx['BByoff0y'] - fbbx['Yoff'];
+                    offtop    = fbbx['FBBy'] - bbx['BBh'] - offbottom;
+
+                    bbx_im = Image.new("1", (fbbx['FBBx'], fbbx['FBBy']), 0)
+                    bbx_im.paste(im,(offleft,offtop))
+                    #bbx_im.show()
+
+                    hz_image = Image.new("1", (hz_width, hz_height), 0)
+                    hz_image.paste(bbx_im,(0,0))
+                    #hz_image.show()
+
+                    get_pix(hz_image).tofile(outfile)
 
 if __name__ == '__main__':
     main()
