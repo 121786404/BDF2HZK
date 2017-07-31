@@ -1,7 +1,26 @@
 @ECHO OFF
-
+del /q/f ..\..\use\mz\wqy\*.mz ..\..\use\hzkbin\wqy\*.bin
 del /q/f ..\..\use\mz\SimSun\*.mz ..\..\use\hzkbin\SimSun\*.bin
 del /q/f ..\..\use\mz\Zfull-GB\*.mz ..\..\use\hzkbin\Zfull-GB\*.bin
+
+python BDF2HZK.py -s "9x9" -o "../../use/hzkbin/wqy/HZ9.bin" "../../use/bdf/wqy/wqy-9.bdf"
+python BDF2HZK.py -s "9x9" -o "../../use/hzkbin/wqy/HZ9b.bin" "../../use/bdf/wqy/wqy-9b.bdf"
+python BDF2HZK.py -s "10x10" -o "../../use/hzkbin/wqy/HZ10.bin" "../../use/bdf/wqy/wqy-10.bdf"
+python BDF2HZK.py -s "10x10" -o "../../use/hzkbin/wqy/HZ10b.bin" "../../use/bdf/wqy/wqy-10b.bdf"
+python BDF2HZK.py -s "11x11" -o "../../use/hzkbin/wqy/HZ11.bin" "../../use/bdf/wqy/wqy-11.bdf"
+python BDF2HZK.py -s "11x11" -o "../../use/hzkbin/wqy/HZ11b.bin" "../../use/bdf/wqy/wqy-11b.bdf"
+python BDF2HZK.py -s "12x12" -o "../../use/hzkbin/wqy/HZ12.bin" "../../use/bdf/wqy/wqy-12.bdf"
+python BDF2HZK.py -s "12x12" -o "../../use/hzkbin/wqy/HZ12b.bin" "../../use/bdf/wqy/wqy-12b.bdf"
+
+
+..\..\use\tools\miniz.exe c ../../use/hzkbin/wqy/HZ9.bin ../../use/mz/wqy/HZ9.mz
+..\..\use\tools\miniz.exe c ../../use/hzkbin/wqy/HZ9b.bin ../../use/mz/wqy/HZ9b.mz
+..\..\use\tools\miniz.exe c ../../use/hzkbin/wqy/HZ10.bin ../../use/mz/wqy/HZ10.mz
+..\..\use\tools\miniz.exe c ../../use/hzkbin/wqy/HZ10b.bin ../../use/mz/wqy/HZ10b.mz
+..\..\use\tools\miniz.exe c ../../use/hzkbin/wqy/HZ11.bin ../../use/mz/wqy/HZ11.mz
+..\..\use\tools\miniz.exe c ../../use/hzkbin/wqy/HZ11b.bin ../../use/mz/wqy/HZ11b.mz
+..\..\use\tools\miniz.exe c ../../use/hzkbin/wqy/HZ12.bin ../../use/mz/wqy/HZ12.mz
+..\..\use\tools\miniz.exe c ../../use/hzkbin/wqy/HZ12b.bin ../../use/mz/wqy/HZ12b.mz
 
 
 python BDF2HZK.py -s "12x12" -o "../../use/hzkbin/SimSun/HZ12.bin" "../../use/bdf/SimSun/SimSun-12.bdf"
